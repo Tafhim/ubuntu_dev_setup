@@ -12,6 +12,7 @@ fi
 USER=$1
 USER_HOME="/home/$USER"
 
+apt-get update
 apt-get install git zsh vim aria2 awesome curl chromium-browser mpd ncmpcpp git conky
 # Sublime setup
 #if [ ! -f $USER_HOME/Downloads/sublime-text_build-3047_amd64.deb ]; then
@@ -54,9 +55,37 @@ cp -f etc/dnsmasq.conf /etc/dnsmasq.conf
 cp -f etc/resolvconf/resolv.conf.d/head /etc/resolvconf/resolv.conf.d/head
 echo "UseDNS no" >> /etc/ssh/sshd_config
 
+# Installing java if the file is ready
+if [ ! -f $PWD/jdk-7u25-linux-x64.tar.gz ]; then
+	echo "Java installation files not present, skipping Java and Nebeans" 
+else
+	tar -xvf jdk-7u25-linux-x64.tar.gz
+	mkdir -p /usr/lib/jvm
+	mv ./jdk1.7.0_25 /usr/lib/jvm/jdk1.7.0
+	update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/jdk1.7.0/bin/java" 1
+	update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/jdk1.7.0/bin/javac" 1
+	update-alternatives --install "/usr/bin/javaws" "javaws" "/usr/lib/jvm/jdk1.7.0/bin/javaws" 1
+	chmod a+x /usr/bin/java
+	chmod a+x /usr/bin/javac
+	chmod a+x /usr/bin/javaws
+	chown -R root:root /usr/lib/jvm/jdk1.7.0
+	update-alternatives --config java
+	update-alternatives --config javac
+	update-alternatives --config javaws
+
+	if [ -d $USER_HOME/.mozilla/plugins ]; then
+		ln -s /usr/lib/jvm/jdk1.7.0/jre/lib/amd64/libnpjp2.so $USER_HOME/.mozilla/plugins/
+	fi
+
+	sed -i -e 's/java-\*-sun-1.\*/jdk\*/g' /etc/apparmor.d/abstractions/ubuntu-browsers.d/java
+	/etc/init.d/apparmor restart
+
+	chmod +x netbeans-7.3-linux.sh
+	./netbeans-7.3-linux.sh
+	rm -rf jdk1.7.0
+fi
+
 
 
 #sudo mysql_install_db
 #sudo /usr/bin/mysql_secure_installation
-# java has to be installed
-# sudo bash netbeans-7.3-linux.sh
