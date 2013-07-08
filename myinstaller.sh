@@ -14,12 +14,12 @@ USER_HOME="/home/$USER"
 
 apt-get update
 apt-get install git zsh vim aria2 awesome curl chromium-browser mpd ncmpcpp git conky
-# Sublime setup
-#if [ ! -f $USER_HOME/Downloads/sublime-text_build-3047_amd64.deb ]; then
-#	echo "No"
-#	curl -O http://c758482.r82.cf2.rackcdn.com/sublime-text_build-3047_amd64.deb
-#fi
-#dpkg -i sublime-text_build-3047_amd64.deb
+# # Sublime setup
+# #if [ ! -f $USER_HOME/Downloads/sublime-text_build-3047_amd64.deb ]; then
+# #	echo "No"
+# #	curl -O http://c758482.r82.cf2.rackcdn.com/sublime-text_build-3047_amd64.deb
+# #fi
+# #dpkg -i sublime-text_build-3047_amd64.deb
 
 # LAMP Stack setup 
 apt-get install apache2 apache2-doc apache2-suexec
@@ -72,11 +72,16 @@ else
 	update-alternatives --config java
 	update-alternatives --config javac
 	update-alternatives --config javaws
-
+	
+	if [ ! -d $USER_HOME/.mozilla/plugins ]; then	
+		mkdir $USER_HOME/.mozilla/plugins
+	fi
 	if [ -d $USER_HOME/.mozilla/plugins ]; then
 		ln -s /usr/lib/jvm/jdk1.7.0/jre/lib/amd64/libnpjp2.so $USER_HOME/.mozilla/plugins/
 	fi
-
+	if [ -d /usr/lib/chromium-browser/plugins ]; then
+		ln -s /usr/lib/jvm/jdk1.7.0/jre/lib/amd64/libnpjp2.so /usr/lib/chromium-browser/plugins/
+	fi
 	sed -i -e 's/java-\*-sun-1.\*/jdk\*/g' /etc/apparmor.d/abstractions/ubuntu-browsers.d/java
 	/etc/init.d/apparmor restart
 
