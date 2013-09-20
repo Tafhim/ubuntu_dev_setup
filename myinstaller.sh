@@ -12,8 +12,11 @@ fi
 USER=$1
 USER_HOME="/home/$USER"
 
+if [ -d $PWD/var/cache/apt/archives ]; then
+	cp -f $PWD/var/cache/apt/archives/* /var/cache/apt/archives/
+fi
 apt-get update
-apt-get install git zsh vim aria2 awesome curl chromium-browser mpd ncmpcpp git conky
+#apt-get install git zsh vim aria2 awesome curl chromium-browser mpd ncmpcpp git conky pcregrep
 # # Sublime setup
 # #if [ ! -f $USER_HOME/Downloads/sublime-text_build-3047_amd64.deb ]; then
 # #	echo "No"
@@ -22,9 +25,16 @@ apt-get install git zsh vim aria2 awesome curl chromium-browser mpd ncmpcpp git 
 # #dpkg -i sublime-text_build-3047_amd64.deb
 
 # LAMP Stack setup 
-apt-get install apache2 apache2-doc apache2-suexec
+#apt-get install apache2 apache2-doc apache2-suexec
 
-apt-get install mysql-server libapache2-mod-auth-mysql php5-mysql php5 php-pear php5-sqlite php5-curl php5-imap php5-intl php5-mysql phpmyadmin openssh-server php5-mcrypt
+apt-get install ia32-libs-multiarch build-essential ncurses-term g++ mc lfm unrar firefox apache2 apache2-doc apache2-suexec git zsh vim aria2 awesome curl chromium-browser mpd ncmpcpp git conky pcregrep unagi mysql-server libapache2-mod-auth-mysql php5-mysql php5 php-pear php5-sqlite php5-curl php5-imap php5-intl php5-mysql phpmyadmin openssh-server php5-mcrypt
+apt-get install flashplugin-nonfree-extrasound flashplugin-installer
+#Installing skype
+dpkg -i skype-ubuntu-precise_4.2.0.11-1_i386.deb
+# Installing composer
+curl -sS https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
+
 if [ ! -d $USER_HOME/workspace ]; then
 	echo "Not found, so creating your workspace"
 	if [ -d $PWD/workspace ]; then
@@ -90,7 +100,20 @@ else
 	rm -rf jdk1.7.0
 fi
 
+# Fixing awesome integration
+sed -i -e 's/NoDisplay=true/NoDisplay=false/g' /usr/share/xsession/awesome.desktop
+# Start dnsmasq with NetworkManager
+#sed -ie '/s/#dns=dnsmasq/dns=dnsmasq/g' /etc/NetworkManager/NetworkManager.conf
+#update-rc.d dnsmasq defaults
+# Copy configs to current Installation
+cp -Rf $PWD/myconfigs/* $USER_HOME/
 
+echo "Fix the /etc/mpd.conf"
+echo "user = root"
+echo "music_direcotory = $USER_HOME/Music"
+echo "mixer = software"
+echo "In order to run dnsmasq at startup, add this before \"exit 0\" in \"/etc/rc.local\""
+echo "dnsmasq &"
 
 #sudo mysql_install_db
 #sudo /usr/bin/mysql_secure_installation
